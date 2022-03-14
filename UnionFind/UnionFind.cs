@@ -23,18 +23,22 @@ public class Node<T>
     }
 }
 
+/// <summary>
+/// Union-Find data structure for memorization od disjoint sets.
+/// </summary>
+/// <typeparam name="T"> The generic data-type to be memorized</typeparam>
 public class UnionFind<T> where T : notnull
 {
-    Dictionary<T, Node<T>> _nodes;
+     public Dictionary<T, Node<T>> Nodes { get; }
 
     public UnionFind()
     {
-        _nodes = new Dictionary<T, Node<T>>();
+        Nodes = new Dictionary<T, Node<T>>();
     }
 
     public bool HasData(T data)
     {
-        return _nodes.ContainsKey(data);
+        return Nodes.ContainsKey(data);
     }
 
     public void MakeSet(T data)
@@ -42,14 +46,14 @@ public class UnionFind<T> where T : notnull
         // check if data is already present, if so skip
         if (HasData(data))
         {
-            _nodes.Add(data, new Node<T>(data));
+            Nodes.Add(data, new Node<T>(data));
         }
     }
 
     public void Union(T dataA, T dataB)
     {
-        var x = _nodes[dataA];
-        var y = _nodes[dataB];
+        var x = Nodes[dataA];
+        var y = Nodes[dataB];
         Link(FindSet(x), FindSet(y));
     }
 
