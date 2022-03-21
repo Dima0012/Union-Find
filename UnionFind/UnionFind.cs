@@ -1,12 +1,14 @@
-﻿namespace UnionFind;
+﻿using System.Collections;
+
+namespace UnionFind;
 
 /// <summary>
 /// Node object for the Union-Find data structure.
 /// </summary>
 /// <typeparam name="T"> The type of data memorized in the Node </typeparam>
-public class Node<T>
+public class Node<T> where T : IComparable<T>
 {
-    public T Data { get; set; }
+    private T Data { get; set; }
     public Node<T> Parent { get; set; }
     public int Rank { get; set; }
 
@@ -14,7 +16,6 @@ public class Node<T>
     /// Constructor for the Node object. It initialize the Data with the argument passed;
     /// sets the Node's Parent as itself and sets the Node's Rank to 0.
     /// </summary>
-    /// <param name="data"> Data to be memorized in the node. </param>
     public Node(T data)
     {
         Data = data;
@@ -27,42 +28,78 @@ public class Node<T>
 /// Union-Find data structure for memorization od disjoint sets.
 /// </summary>
 /// <typeparam name="T"> The generic data-type to be memorized</typeparam>
-public class UnionFind<T> where T : notnull
+public class UnionFind<T>: IEnumerable<T> where T : IComparable<T>
 {
-     public Dictionary<T, Node<T>> Nodes { get; }
+    private Dictionary<T, Node<T>> Nodes { get; }
+
+    public int Count => Nodes.Count;
 
     public UnionFind()
     {
         Nodes = new Dictionary<T, Node<T>>();
     }
+    
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return Nodes.Keys.GetEnumerator();
+    }
+    
+    public IEnumerator<T> GetEnumerator()
+    {
+        return Nodes.Keys.GetEnumerator();
+    }
 
-    public bool HasData(T data)
+    /// <summary>
+    /// Removes all keys and values from the dictionary.
+    /// </summary>
+    public void Clear()
+    {
+        Nodes.Clear();
+    }
+    
+    /// <summary>
+    /// Checks if data is present in the dictionary.
+    /// </summary>
+    private bool HasData(T data)
     {
         return Nodes.ContainsKey(data);
     }
-
-    public void MakeSet(T data)
+    
+    /// <summary>
+    /// Makes a new set out of data, creating a new Node with default initialization and returns true. 
+    /// If the data is already present, returns false.
+    /// </summary>
+    public bool MakeSet(T data)
     {
-        // check if data is already present, if so skip
         if (HasData(data))
         {
-            Nodes.Add(data, new Node<T>(data));
+            return false;
         }
+        Nodes.Add(data, new Node<T>(data));
+        return true;
     }
 
-    public void Union(T dataA, T dataB)
+    /// <summary>
+    /// Performs a union operation of dataA, dataB by invoking Link on the corresponding Nodes.
+    /// Returns false if one of the data is not present in the sets.
+    /// </summary>
+    public bool Union(T dataA, T dataB)
     {
+        if (!HasData(dataA) || !HasData(dataB) )
+        {
+            return false;
+        }
         var x = Nodes[dataA];
         var y = Nodes[dataB];
         Link(FindSet(x), FindSet(y));
+        return true;
     }
 
-    public void Link(Node<T> x, Node<T> y)
+    /// <summary>
+    /// Links two Nodes by rank.
+    /// </summary>
+    private static void Link(Node<T> x, Node<T> y)
     {
-        // get nodes from dictionary
-        // var x = _nodes[dataA];
-        // var y = _nodes[dataB];
-
         if (x.Rank > y.Rank)
         {
             y.Parent = x;
@@ -76,8 +113,11 @@ public class UnionFind<T> where T : notnull
             }
         }
     }
-
-    public Node<T> FindSet(Node<T> x)
+    
+    /// <summary>
+    /// Returns the root for the Node x. Also applies path compression to the Node's path
+    /// </summary>
+    private static Node<T> FindSet(Node<T> x)
     {
         if (x != x.Parent)
         {
