@@ -8,7 +8,7 @@ namespace UnionFind;
 /// <typeparam name="T"> The type of data memorized in the Node </typeparam>
 public class Node<T> where T : IComparable<T>
 {
-    private T Data { get; set; }
+    public T Data { get; set; }
     public Node<T> Parent { get; set; }
     public int Rank { get; set; }
 
@@ -30,7 +30,7 @@ public class Node<T> where T : IComparable<T>
 /// <typeparam name="T"> The generic data-type to be memorized</typeparam>
 public class UnionFind<T>: IEnumerable<T> where T : IComparable<T>
 {
-    private Dictionary<T, Node<T>> Nodes { get; }
+    public Dictionary<T, Node<T>> Nodes { get; set; }
 
     public int Count => Nodes.Count;
 
@@ -85,10 +85,10 @@ public class UnionFind<T>: IEnumerable<T> where T : IComparable<T>
     /// </summary>
     public bool Union(T dataA, T dataB)
     {
-        if (!HasData(dataA) || !HasData(dataB) )
-        {
-            return false;
-        }
+        // if (!HasData(dataA) || !HasData(dataB) )
+        // {
+        //     return false;
+        // }
         var x = Nodes[dataA];
         var y = Nodes[dataB];
         Link(FindSet(x), FindSet(y));
@@ -117,7 +117,7 @@ public class UnionFind<T>: IEnumerable<T> where T : IComparable<T>
     /// <summary>
     /// Returns the root for the Node x. Also applies path compression to the Node's path
     /// </summary>
-    private static Node<T> FindSet(Node<T> x)
+    public Node<T> FindSet(Node<T> x)
     {
         if (x != x.Parent)
         {
@@ -126,4 +126,16 @@ public class UnionFind<T>: IEnumerable<T> where T : IComparable<T>
 
         return x.Parent;
     }
+    
+    public Node<T> FindSet(T data)
+    {
+        var x = Nodes[data];
+        if (x != x.Parent)
+        {
+            x.Parent = FindSet(x.Parent);
+        }
+
+        return x.Parent;
+    }
+    
 }
