@@ -1,6 +1,6 @@
 ﻿using UnionFind;
 
-// Hosenhen-Kopelman implementation for a PBC square grid
+// Hoshen-Kopelman implementation for a PBC square grid
 
 const int n = 80;
 var label = 1;
@@ -14,58 +14,42 @@ var rng = new Random();
 
 
 for (var i = 0; i < n; i++)
+for (var j = 0; j < n; j++)
 {
-    for (var j = 0; j < n; j++)
+    var r = rng.NextDouble();
+    if (r < p)
     {
-        var r = rng.NextDouble();
-        if (r < p)
-        {
-            m[i, j] = 1;
-            mLabels[i, j] = label;
-            label += 1;
+        m[i, j] = 1;
+        mLabels[i, j] = label;
+        label += 1;
 
-            uf.MakeSet(mLabels[i, j]);
-        }
-        else
-        {
-            m[i, j] = 0;
-            mLabels[i, j] = 0;
-            uf.MakeSet(mLabels[i, j]);
-        }
+        uf.MakeSet(mLabels[i, j]);
+    }
+    else
+    {
+        m[i, j] = 0;
+        mLabels[i, j] = 0;
+        uf.MakeSet(mLabels[i, j]);
     }
 }
 
 // Union Set
 
-for (int i = 0; i < n; i++)
-{
-    for (int j = 0; j < n; j++)
+for (var i = 0; i < n; i++)
+for (var j = 0; j < n; j++)
+    if (m[i, j] != 0)
     {
-        if (m[i, j] != 0)
-        {
-            // Look up
-            if (m[Pbc(i - 1), j] != 0)
-            {
-                uf.Union(mLabels[Pbc(i - 1), j], mLabels[i, j]);
-            }
+        // Look up
+        if (m[Pbc(i - 1), j] != 0) uf.Union(mLabels[Pbc(i - 1), j], mLabels[i, j]);
 
-            // Look left
-            if (m[i, Pbc(j - 1)] != 0)
-            {
-                uf.Union(mLabels[i, Pbc(j - 1)], mLabels[i, j]);
-            }
-        }
+        // Look left
+        if (m[i, Pbc(j - 1)] != 0) uf.Union(mLabels[i, Pbc(j - 1)], mLabels[i, j]);
     }
-}
 
 
 for (var i = 0; i < n; i++)
-{
-    for (var j = 0; j < n; j++)
-    {
-        mLabels[i, j] = uf.FindSet(mLabels[i, j]).Data;
-    }
-}
+for (var j = 0; j < n; j++)
+    mLabels[i, j] = uf.FindSet(mLabels[i, j]).Data;
 
 
 const string filepathLabels =
