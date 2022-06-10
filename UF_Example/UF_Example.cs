@@ -8,7 +8,7 @@ var m = new int[n, n];
 const double p = 0.5;
 
 var uf = new UnionFind<int>();
-var rng = new Random();
+var rng = new Random(345);
 
 
 for (var i = 0; i < n; i++)
@@ -26,7 +26,7 @@ for (var j = 0; j < n; j++)
 }
 
 // RUn HK
-var mLabels = HoshenKopelman(m);
+var mLabels = HoshenKopelman(m, n);
 
 const string filepathLabels =
     "/Users/mdima/Desktop/Magistrale/Strutture Dati e Algoritmi/Union-Find/Cluster_testing/labels.txt";
@@ -54,7 +54,7 @@ Console.WriteLine("Cluster and Labels matrices written successfully!");
 
 // ****************** ======= ******************
 
-int[,] HoshenKopelman(int[,] C)
+int[,] HoshenKopelman(int[,] C, int n)
 {
     var L = new int[n, n];
     var label = 1;
