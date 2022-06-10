@@ -2,7 +2,7 @@
 
 // Hoshen-Kopelman implementation for a PBC square grid
 
-const int n = 10;
+const int n = 3;
 
 var m = new int[n, n];
 const double p = 0.5;
@@ -26,7 +26,7 @@ for (var j = 0; j < n; j++)
 }
 
 // RUn HK
-var mLabels = HoshenKopelman(m, n);
+var mLabels = HoshenKopelman(m, n, uf);
 
 const string filepathLabels =
     "/Users/mdima/Desktop/Magistrale/Strutture Dati e Algoritmi/Union-Find/Cluster_testing/labels.txt";
@@ -54,7 +54,7 @@ Console.WriteLine("Cluster and Labels matrices written successfully!");
 
 // ****************** ======= ******************
 
-int[,] HoshenKopelman(int[,] C, int n)
+int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> uf)
 {
     var L = new int[n, n];
     var label = 1;
@@ -64,27 +64,34 @@ int[,] HoshenKopelman(int[,] C, int n)
     {
         if (C[i, j] != 0) // Occupied
         {
-            if (C[Pbc(i - 1), j] == 0 && C[i, Pbc(j - 1)] == 0) // Neither neighbors occupied
+            var occupied = C[i, j];
+            var left = C[Pbc(i - 1), j];
+            var leftLabel = L[Pbc(i - 1), j];
+            var above = C[i, Pbc(j - 1)];
+            var aboveLabel = L[i, Pbc(j - 1)];
+            
+            
+            if (left == 0 && above == 0 || leftLabel == 0 && aboveLabel == 0) // Neither neighbors occupied nor labeled
             {
                 L[i, j] = label;
                 uf.MakeSet(L[i, j]);
                 label += 1;
             }
 
-            if (C[Pbc(i - 1), j] != 0 && L[Pbc(i - 1), j] != 0 && C[i, Pbc(j - 1)] == 0) // Left neighbor occupied and labeled
+            if (left != 0 && leftLabel != 0 && above == 0) // Left neighbor occupied and labeled
             {
-                L[i, j] = uf.FindSet(L[Pbc(i - 1), j]).Data; // Copy label
+                L[i, j] = uf.FindSet(leftLabel).Data; // Copy label
             }
 
-            if (C[Pbc(i - 1), j] == 0 && C[i, Pbc(j - 1)] != 0 && L[i, Pbc(j - 1)] != 0) // Above neighbor occupied and labeled
+            if (left == 0 && above != 0 && aboveLabel != 0) // Above neighbor occupied and labeled
             {
-                L[i, j] = uf.FindSet(L[i, Pbc(j - 1)]).Data; // Copy label
+                L[i, j] = uf.FindSet(aboveLabel).Data; // Copy label
             }
 
-            else if ( L[Pbc(i - 1), j] != 0 && L[i, Pbc(j - 1)] != 0 )
+            else if ( leftLabel != 0 && aboveLabel != 0 ) // Both neighbor occupied and labeled
             {
-                uf.Union(L[Pbc(i - 1), j], L[i, Pbc(j - 1)]);
-                L[i, j] = uf.FindSet(L[i - 1, j]).Data; // Copy label
+                uf.Union(leftLabel, aboveLabel);
+                L[i, j] = uf.FindSet(left).Data; // Copy label
             }
         }
     }
