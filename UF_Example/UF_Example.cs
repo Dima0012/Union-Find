@@ -2,13 +2,13 @@
 
 // Hoshen-Kopelman implementation for a PBC square grid
 
-const int n = 3;
+const int n = 4;
 
 var m = new int[n, n];
 const double p = 0.5;
 
 var uf = new UnionFind<int>();
-var rng = new Random(345);
+var rng = new Random();
 
 
 for (var i = 0; i < n; i++)
@@ -54,7 +54,7 @@ Console.WriteLine("Cluster and Labels matrices written successfully!");
 
 // ****************** ======= ******************
 
-int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> uf)
+int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> unionFind)
 {
     var L = new int[n, n];
     var label = 1;
@@ -74,24 +74,24 @@ int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> uf)
             if (left == 0 && above == 0 || leftLabel == 0 && aboveLabel == 0) // Neither neighbors occupied nor labeled
             {
                 L[i, j] = label;
-                uf.MakeSet(L[i, j]);
+                unionFind.MakeSet(L[i, j]);
                 label += 1;
             }
 
             if (left != 0 && leftLabel != 0 && above == 0) // Left neighbor occupied and labeled
             {
-                L[i, j] = uf.FindSet(leftLabel).Data; // Copy label
+                L[i, j] = unionFind.FindSet(leftLabel).Data; // Copy label
             }
 
             if (left == 0 && above != 0 && aboveLabel != 0) // Above neighbor occupied and labeled
             {
-                L[i, j] = uf.FindSet(aboveLabel).Data; // Copy label
+                L[i, j] = unionFind.FindSet(aboveLabel).Data; // Copy label
             }
 
             else if ( leftLabel != 0 && aboveLabel != 0 ) // Both neighbor occupied and labeled
             {
-                uf.Union(leftLabel, aboveLabel);
-                L[i, j] = uf.FindSet(left).Data; // Copy label
+                unionFind.Union(leftLabel, aboveLabel);
+                L[i, j] = unionFind.FindSet(above).Data; // Copy label
             }
         }
     }
