@@ -64,7 +64,6 @@ int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> unionFind)
     {
         if (C[i, j] == 1 ) // Occupied and not labeled
         {
-            var occupied = C[i, j];
             var left = C[Pbc(i - 1), j];
             var leftLabel = L[Pbc(i - 1), j];
             var above = C[i, Pbc(j - 1)];
@@ -88,6 +87,8 @@ int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> unionFind)
                 }
 
                 L[i, j] = unionFind.FindSet(leftLabel).Data; // Copy label
+                unionFind.MakeSet(L[i, j]);
+                unionFind.Union(leftLabel, L[i,j]);
             }
 
             else if (left == 0 && above == 1) // Above neighbor occupied and labeled
@@ -101,6 +102,8 @@ int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> unionFind)
                 }
 
                 L[i, j] = unionFind.FindSet(aboveLabel).Data; // Copy label
+                unionFind.MakeSet(L[i, j]);
+                unionFind.Union(aboveLabel, L[i,j]);
             }
 
             else // Both neighbor occupied and labeled
@@ -123,7 +126,18 @@ int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> unionFind)
 
                 unionFind.Union(leftLabel, aboveLabel);
                 L[i, j] = unionFind.FindSet(leftLabel).Data; // Copy label
+                unionFind.MakeSet(L[i, j]);
+                unionFind.Union(leftLabel, L[i, j]);
             }
+        }
+    }
+
+    for (var i = 0; i < n; i++)
+    for (var j = 0; j < n; j++)
+    {
+        if (unionFind.HasData(L[i,j]))
+        {
+            L[i, j] = unionFind.FindSet(L[i, j]).Data;
         }
     }
 
