@@ -2,7 +2,7 @@
 
 // Hoshen-Kopelman implementation for a PBC square grid
 
-const int n = 3;
+const int n = 6;
 
 var m = new int[n, n];
 const double p = 0.5;
@@ -62,80 +62,73 @@ int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> unionFind)
     for (var i = 0; i < n; i++)
     for (var j = 0; j < n; j++)
     {
-        if (C[i, j] == 1 ) // Occupied and not labeled
+        if (C[i, j] == 1) // Occupied and not labeled
         {
             var left = C[Pbc(i - 1), j];
             var leftLabel = L[Pbc(i - 1), j];
             var above = C[i, Pbc(j - 1)];
             var aboveLabel = L[i, Pbc(j - 1)];
 
-            if (left == 0 && above == 0) // Neither neighbors occupied nor labeled
-            {
-                L[i, j] = label;
-                unionFind.MakeSet(L[i, j]);
-                label += 1;
-            }
 
-            else if (left == 1 && above == 0) // Left neighbor occupied and labeled
-            {
-                if (!unionFind.HasData(leftLabel))
-                {
-                    L[Pbc(i - 1), j] = label;
-                    leftLabel = label;
-                    unionFind.MakeSet(L[Pbc(i - 1), j]);
-                    label += 1;
-                }
+            L[i, j] = label;
+            unionFind.MakeSet(L[i, j]);
+            label += 1;
 
-                L[i, j] = unionFind.FindSet(leftLabel).Data; // Copy label
-                unionFind.MakeSet(L[i, j]);
-                unionFind.Union(leftLabel, L[i,j]);
-            }
 
-            else if (left == 0 && above == 1) // Above neighbor occupied and labeled
-            {
-                if (!unionFind.HasData(aboveLabel))
-                {
-                    L[i, Pbc(j - 1)] = label;
-                    aboveLabel = label;
-                    unionFind.MakeSet(L[i, Pbc(j - 1)]);
-                    label += 1;
-                }
-
-                L[i, j] = unionFind.FindSet(aboveLabel).Data; // Copy label
-                unionFind.MakeSet(L[i, j]);
-                unionFind.Union(aboveLabel, L[i,j]);
-            }
-
-            else // Both neighbor occupied and labeled
+            if (left == 1) // Left neighbor occupied and labeled
             {
                 if (!unionFind.HasData(leftLabel))
                 {
-                    L[Pbc(i - 1), j] = label;
-                    leftLabel = label;
+                    L[Pbc(i - 1), j] = L[i, j];
+                    leftLabel = L[i, j];
                     unionFind.MakeSet(L[Pbc(i - 1), j]);
-                    label += 1;
                 }
 
-                if (!unionFind.HasData(aboveLabel))
-                {
-                    L[i, Pbc(j - 1)] = label;
-                    aboveLabel = label;
-                    unionFind.MakeSet(L[i, Pbc(j - 1)]);
-                    label += 1;
-                }
-
-                unionFind.Union(leftLabel, aboveLabel);
-                L[i, j] = unionFind.FindSet(leftLabel).Data; // Copy label
-                unionFind.MakeSet(L[i, j]);
                 unionFind.Union(leftLabel, L[i, j]);
             }
+
+            if (above == 1) // Above neighbor occupied and labeled
+            {
+                if (!unionFind.HasData(aboveLabel))
+                {
+                    L[i, Pbc(j - 1)] = L[i, j];
+                    aboveLabel = L[i, j];
+                    unionFind.MakeSet(L[i, Pbc(j - 1)]);
+                }
+
+                unionFind.Union(aboveLabel, L[i, j]);
+            }
+            
+            // else // Both neighbor occupied and labeled
+            // {
+            //     if (!unionFind.HasData(leftLabel))
+            //     {
+            //         L[Pbc(i - 1), j] = label;
+            //         leftLabel = label;
+            //         unionFind.MakeSet(L[Pbc(i - 1), j]);
+            //         label += 1;
+            //     }
+            //
+            //     if (!unionFind.HasData(aboveLabel))
+            //     {
+            //         L[i, Pbc(j - 1)] = label;
+            //         aboveLabel = label;
+            //         unionFind.MakeSet(L[i, Pbc(j - 1)]);
+            //         label += 1;
+            //     }
+            //
+            //     unionFind.Union(leftLabel, aboveLabel);
+            //     L[i, j] = unionFind.FindSet(leftLabel).Data; // Copy label
+            //     unionFind.MakeSet(L[i, j]);
+            //     unionFind.Union(leftLabel, L[i, j]);
+            // }
         }
     }
 
     for (var i = 0; i < n; i++)
     for (var j = 0; j < n; j++)
     {
-        if (unionFind.HasData(L[i,j]))
+        if (unionFind.HasData(L[i, j]))
         {
             L[i, j] = unionFind.FindSet(L[i, j]).Data;
         }
