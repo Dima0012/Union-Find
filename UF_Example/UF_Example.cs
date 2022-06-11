@@ -2,13 +2,13 @@
 
 // Hoshen-Kopelman implementation for a PBC square grid
 
-const int n = 4;
+const int n = 3;
 
 var m = new int[n, n];
 const double p = 0.5;
 
 var uf = new UnionFind<int>();
-var rng = new Random();
+var rng = new Random(3);
 
 
 for (var i = 0; i < n; i++)
@@ -25,7 +25,7 @@ for (var j = 0; j < n; j++)
     }
 }
 
-// RUn HK
+// Run HK
 var mLabels = HoshenKopelman(m, n, uf);
 
 const string filepathLabels =
@@ -57,41 +57,72 @@ Console.WriteLine("Cluster and Labels matrices written successfully!");
 int[,] HoshenKopelman(int[,] C, int n, UnionFind<int> unionFind)
 {
     var L = new int[n, n];
-    var label = 1;
+    var label = 2;
 
     for (var i = 0; i < n; i++)
     for (var j = 0; j < n; j++)
     {
-        if (C[i, j] != 0) // Occupied
+        if (C[i, j] == 1 ) // Occupied and not labeled
         {
             var occupied = C[i, j];
             var left = C[Pbc(i - 1), j];
             var leftLabel = L[Pbc(i - 1), j];
             var above = C[i, Pbc(j - 1)];
             var aboveLabel = L[i, Pbc(j - 1)];
-            
-            
-            if (left == 0 && above == 0 || leftLabel == 0 && aboveLabel == 0) // Neither neighbors occupied nor labeled
+
+            if (left == 0 && above == 0) // Neither neighbors occupied nor labeled
             {
                 L[i, j] = label;
                 unionFind.MakeSet(L[i, j]);
                 label += 1;
             }
 
-            if (left != 0 && leftLabel != 0 && above == 0) // Left neighbor occupied and labeled
+            else if (left == 1 && above == 0) // Left neighbor occupied and labeled
             {
+                if (!unionFind.HasData(leftLabel))
+                {
+                    L[Pbc(i - 1), j] = label;
+                    leftLabel = label;
+                    unionFind.MakeSet(L[Pbc(i - 1), j]);
+                    label += 1;
+                }
+
                 L[i, j] = unionFind.FindSet(leftLabel).Data; // Copy label
             }
 
-            if (left == 0 && above != 0 && aboveLabel != 0) // Above neighbor occupied and labeled
+            else if (left == 0 && above == 1) // Above neighbor occupied and labeled
             {
+                if (!unionFind.HasData(aboveLabel))
+                {
+                    L[i, Pbc(j - 1)] = label;
+                    aboveLabel = label;
+                    unionFind.MakeSet(L[i, Pbc(j - 1)]);
+                    label += 1;
+                }
+
                 L[i, j] = unionFind.FindSet(aboveLabel).Data; // Copy label
             }
 
-            else if ( leftLabel != 0 && aboveLabel != 0 ) // Both neighbor occupied and labeled
+            else // Both neighbor occupied and labeled
             {
+                if (!unionFind.HasData(leftLabel))
+                {
+                    L[Pbc(i - 1), j] = label;
+                    leftLabel = label;
+                    unionFind.MakeSet(L[Pbc(i - 1), j]);
+                    label += 1;
+                }
+
+                if (!unionFind.HasData(aboveLabel))
+                {
+                    L[i, Pbc(j - 1)] = label;
+                    aboveLabel = label;
+                    unionFind.MakeSet(L[i, Pbc(j - 1)]);
+                    label += 1;
+                }
+
                 unionFind.Union(leftLabel, aboveLabel);
-                L[i, j] = unionFind.FindSet(above).Data; // Copy label
+                L[i, j] = unionFind.FindSet(leftLabel).Data; // Copy label
             }
         }
     }

@@ -60,7 +60,7 @@ public class UnionFind<T>: IEnumerable<T> where T : IComparable<T>
     /// <summary>
     /// Checks if data is present in the dictionary.
     /// </summary>
-    private bool HasData(T data)
+    public bool HasData(T data)
     {
         return Nodes.ContainsKey(data);
     }
